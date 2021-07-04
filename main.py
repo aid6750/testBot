@@ -1,9 +1,10 @@
-import asyncio
 from aiogram import Bot, Dispatcher, executor
 from config import TOKEN
-loop = asyncio.get_event_loop()
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+
 bot = Bot(TOKEN)
-dp = Dispatcher(bot, loop=loop)
+storage = MemoryStorage()
+dp = Dispatcher(bot, storage=storage)
 
 
 if __name__ == "__main__":
