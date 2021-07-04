@@ -13,3 +13,8 @@ async def show_menu(message: Message):
 async def on_button_menu_clicked(message: Message):
     print(ReplyKeyboardRemove())
     await message.answer(f'вы выбрали "{message.text}"', reply_markup=ReplyKeyboardRemove())
+
+
+@dp.message_handler()
+async def answer_to_message(message : Message):
+    await message.answer("Я тут")
