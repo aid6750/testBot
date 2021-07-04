@@ -16,11 +16,11 @@ class Test(StatesGroup):
         result = f"вы ответели правильно на {self.goodAnswers}"
 
         if self.goodAnswers % 100 >= 10 and self.goodAnswers <= 20 or self.goodAnswers % 10 == 0:
-            result += "вопросов "
+            result += " вопросов "
         elif self.goodAnswers % 10 == 1:
-            result += "вопрос "
+            result += " вопрос "
         else:
-            result += "вопроса "
+            result += " вопроса "
 
         rating = ceil(self.goodAnswers / self.quantity * 5)
         if rating < 2:
@@ -30,5 +30,5 @@ class Test(StatesGroup):
                         "Не расстраивайся. Математика дана не всем", "Ты можешь лучше",
                         "Неплохой результат",
                         "Умница")
-        result += string_array[rating]
+        result += string_array[rating-1]
         return result
