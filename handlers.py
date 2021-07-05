@@ -1,4 +1,4 @@
-from main import dp
+from main import dp, bot
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.dispatcher.filters import Command, Text
 from menu import menu, proposals
@@ -6,6 +6,8 @@ from test import Test
 from random import randrange
 from aiogram.dispatcher import FSMContext
 from contextvars import ContextVar
+from config import ADMIN_ID
+from math import ceil
 
 test = Test()
 
@@ -50,21 +52,21 @@ async def on_button_proposals_clicked(message: Message):
 async def answer(message: Message, state: FSMContext):
     global test
     praise = ("молодец", "так держать!", "здорово", "Ты просто монстр", "Продолжай в том же духе")
-    number = 0
-    try:
-        number = int(message.text)
-    except BaseException:
-        await message.answer("введите число")
-        return
-
     test.counter += 1
     if test.counter <= test.quantity:
+        number = 0
+        try:
+            number = int(message.text)
+        except BaseException:
+            await message.answer("введите число")
+            return
+
         if number == test.rightAnswer:
             await message.answer(praise[randrange(len(praise))])
             test.goodAnswers += 1
         else:
             await message.answer("не верно")
-
+    if test.quantity != test.counter:
         op1 = randrange(100)
         op2 = randrange(100)
         ques = f"сколько будет {op1}{test.mode}{op2}?"
@@ -76,7 +78,11 @@ async def answer(message: Message, state: FSMContext):
 
         await message.answer(text=ques)
         await test.question.set()
-    else:
+    if test.counter == test.quantity:
         await message.answer(test.result())
         await state.finish()
         test.counter = 0
+        await bot.send_message(chat_id=ADMIN_ID, text=f"пользователь {message.from_user.username} "
+                                                      f"получил оценку {test.rating}")
+
+

@@ -9,20 +9,25 @@ class Test(StatesGroup):
     goodAnswers = 0
     rightAnswer = 0
     mode = 0
+    rating = 0
 
     def result(self):
         result = f"Ты ответел правильно на {self.goodAnswers}"
 
-        if self.goodAnswers % 100 >= 10 and self.goodAnswers <= 20 or self.goodAnswers % 10 == 5:
+        if self.goodAnswers % 100 >= 10 and self.goodAnswers <= 20:
             result += " вопросов "
         elif self.goodAnswers % 10 == 1:
             result += " вопрос "
+        elif self.goodAnswers % 10 == 0 or self.goodAnswers % 10 >=5 :
+            result += " вопросов "
         else:
             result += " вопроса "
 
         rating = ceil(self.goodAnswers / self.quantity * 5)
         if rating < 2:
             rating = 2
+        self.rating = int(rating)
+
         result += f"\nи получил оценку {int(rating)}. "
         string_array = ("Не расстраивайся. Математика дана не всем",
                         "Не расстраивайся. Математика дана не всем", "Ты можешь лучше",
