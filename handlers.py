@@ -32,7 +32,6 @@ async def on_button_proposals_clicked(message: Message):
     quantity = int(message.text)
     await message.answer(f"желаю удачи, {message.from_user.username}")
     test.quantity = quantity
-    await message.answer(f"ваш выбор:{test.quantity}")
     operand1 = randrange(100)
     operand2 = randrange(100)
     question = f"сколько будет {operand1}{test.mode}{operand2}?"
