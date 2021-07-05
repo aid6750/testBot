@@ -84,5 +84,3 @@ async def answer(message: Message, state: FSMContext):
         test.counter = 0
         await bot.send_message(chat_id=ADMIN_ID, text=f"пользователь {message.from_user.username} "
                                                       f"получил оценку {test.rating}")
-
-
