@@ -7,6 +7,7 @@ from random import randrange
 from aiogram.dispatcher import FSMContext
 from config import ADMIN_ID
 import time
+import datetime as DT
 
 
 @dp.message_handler(Command("test"), state=None)
@@ -20,7 +21,8 @@ async def on_button_menu_clicked(message: Message, state: FSMContext):
     test.counter = 0
     test.mode = message.text
     test.quantity = len(test.tests[message.text])
-    await state.update_data({"test": test})
+    date = DT.datetime.utcnow()
+    await state.update_data({"test": test,"date": date })
     question = open(test.tests[test.mode][test.counter + 1][0], "rb")
     intro = test.tests[test.mode][test.counter+1][3]
     await message.answer(intro)
@@ -37,6 +39,8 @@ async def answer(message: Message, state: FSMContext):
     rightAnswer = test.tests[test.mode][test.counter + 1][1].lower().strip()
     explanation = test.tests[test.mode][test.counter + 1][2]
 
+    if await is_spam(state):
+        return
     if message.text.lower().strip() != rightAnswer:
         await message.answer("не верно")
         await message.answer(explanation)
@@ -44,11 +48,14 @@ async def answer(message: Message, state: FSMContext):
         await message.answer(praise[randrange(len(praise))])
         test.goodAnswers += 1
     test.counter += 1
-    await state.update_data({"test": test})
+    date = DT.datetime.utcnow()
     if test.quantity > test.counter:
         await test.question.set()
         question = open(test.tests[test.mode][test.counter + 1][0], "rb")
         await bot.send_photo(chat_id=message.chat.id, photo=question)
+
+    await state.update_data({"test": test, "data": date})
+
     if test.counter == test.quantity:
         await message.answer(test.result())
         await state.update_data({"test": Test()})
@@ -58,5 +65,20 @@ async def answer(message: Message, state: FSMContext):
 
 
 @dp.message_handler()
-async def undefined_message(message: Message):
-    await message.answer("я вас не понимаю. Для запуска бота введите команду /test")
+async def undefined_message(message: Message, state : FSMContext):
+    if not await is_spam(state):
+        await message.answer("я вас не понимаю. Для запуска бота введите команду /test")
+
+
+async def is_spam(state: FSMContext):
+    date = DT.datetime.utcnow()
+    data = await state.get_data()
+    if(data.get("date") == None):
+        await state.update_data({"test": Test(), "date": date})
+        return False
+    date1 = data.get("date")
+    await state.update_data({"test":  data.get("test"), "date": date})
+    if abs(int(date.timestamp()-date1.timestamp())) > 2:
+        return False
+    else:
+        return True
