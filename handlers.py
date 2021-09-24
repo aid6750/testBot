@@ -33,20 +33,25 @@ async def on_button_menu_clicked(message: Message, state: FSMContext):
 
 @dp.message_handler(state=Test.question)
 async def answer(message: Message, state: FSMContext):
-    test = await state.get_data()
-    test = test.get("test")
+    data = await state.get_data()
+    test = data.get("test")
     praise = ("молодец", "так держать!", "здорово", "правильно!", "верно, продолжай в том же духе")
     rightAnswer = test.tests[test.mode][test.counter + 1][1].lower().strip()
     explanation = test.tests[test.mode][test.counter + 1][2]
 
     if await is_spam(state):
         return
+
+    test.report += f"{test.counter+1} "
+
     if message.text.lower().strip() != rightAnswer:
         await message.answer("не верно")
+        test.report += "-\n"
         await message.answer(explanation)
     else:
         await message.answer(praise[randrange(len(praise))])
         test.goodAnswers += 1
+        test.report += "+\n"
     test.counter += 1
     date = DT.datetime.utcnow()
     if test.quantity > test.counter:
@@ -62,6 +67,7 @@ async def answer(message: Message, state: FSMContext):
         await state.finish()
         await bot.send_message(chat_id=ADMIN_ID, text=f"пользователь {message.from_user.username} "
                                                       f"получил оценку {test.rating}")
+        await bot.send_message(chat_id=ADMIN_ID, text=test.report)
 
 
 @dp.message_handler()

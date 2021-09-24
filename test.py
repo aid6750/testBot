@@ -8,6 +8,7 @@ class Test(StatesGroup):
     quantity = 0
     goodAnswers = 0
     mode = ""
+    report = "подробный отчет:\n"
     tests = {
         'что выведет программа 1':
             {
